@@ -1,0 +1,7 @@
+cdomain: cloudplus.io
+repo: cloudplus.io
+resources:
+- group: cluster
+  kind: AlicloudCluster
+  version: v1
+version: "2"

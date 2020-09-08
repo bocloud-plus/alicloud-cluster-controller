@@ -1,0 +1,7 @@
+apiVersion: cluster.cloudplus.io/v1
+kind: AlicloudCluster
+metadata:
+  name: alicloudcluster-sample
+spec:
+  # Add fields here
+  foo: bar

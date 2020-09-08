@@ -1,0 +1,20 @@
+# permissions for end users to view alicloudclusters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alicloudcluster-viewer-role
+rules:
+- apiGroups:
+  - cluster.cloudplus.io
+  resources:
+  - alicloudclusters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cluster.cloudplus.io
+  resources:
+  - alicloudclusters/status
+  verbs:
+  - get
