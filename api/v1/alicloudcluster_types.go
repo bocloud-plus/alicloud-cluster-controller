@@ -28,8 +28,8 @@ type AlicloudClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of AlicloudCluster. Edit AlicloudCluster_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Region ID
+	RegionId string `json:"region_id"`
 
 	// VPC Spec
 	Vpc VpcSpec `json:"vpc"`
@@ -40,6 +40,9 @@ type AlicloudClusterSpec struct {
 	// Cluter Spec
 
 	Cluster ClusterSpec `json:"cluster"`
+
+	// Cluster Workers
+	Nodes []string `json:"nodes,omitempty"`
 }
 
 // AlicloudClusterStatus defines the observed state of AlicloudCluster
@@ -47,14 +50,30 @@ type AlicloudClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
+	Vpc Vpc `json:"vpc,omitempty"`
+
+	VSwitch VSwitch `json:"vswitch,omitempty"`
+
+	Cluster Cluster `json:"cluster,omitempty"`
+
+	// Cluster ID
+	ClusterId string `json:"cluster_id"`
+
+	// Phase
 	Phase string `json:"phase"`
 
-	NumOfWorker string `json:"number of worker"`
+	//NumOfWorker string `json:"number of worker"`
+
+	KubeConfig string `json:"kubeconfig"`
+
+	Nodes []string `json:"nodes,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // AlicloudCluster is the Schema for the alicloudclusters API
+// +kubebuilder:printcolumn:name="VPCID",type="string",JSONPath=".status.vpc.VpcId",description="VPC ID"
+// +kubebuilder:printcolumn:name="VSwitchID",type="string",JSONPath=".status.vswitch.VSwitchId",description="VSwitch ID"
 type AlicloudCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

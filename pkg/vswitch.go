@@ -26,7 +26,7 @@ type VSwitchClient struct {
 	cli *vpc.Client
 }
 
-func (c *VSwitchClient) Describe(vSwitchId string) (*vpc.VSwitch, error) {
+func (c *VSwitchClient) Describe(vSwitchId string) (*v1.VSwitch, error) {
 	logger := c.WithValues("SDKAction", "Describe", "id", vSwitchId)
 
 	req := vpc.CreateDescribeVSwitchesRequest()
@@ -51,10 +51,13 @@ func (c *VSwitchClient) Describe(vSwitchId string) (*vpc.VSwitch, error) {
 	if resp.TotalCount == 0 {
 		return nil, nil
 	}
-	ret := &resp.VSwitches.VSwitch[0]
+	ret := &v1.VSwitch{}
+
+	ret.Fill(&resp.VSwitches.VSwitch[0])
+
 	return ret, nil
 }
-func (c *VSwitchClient) Create(spec *v1.VSwitchSpec) (string, error) {
+func (c *VSwitchClient) Create(spec v1.VSwitchSpec) (string, error) {
 	logger := c.WithValues("SDKAction", "Create")
 	req := spec.ConvertToCreateRequest()
 
@@ -80,11 +83,11 @@ func (c *VSwitchClient) Create(spec *v1.VSwitchSpec) (string, error) {
 	return resp.VSwitchId, nil
 }
 
-func (c *VSwitchClient) WaitReady(vSwitchId string) (*vpc.VSwitch, error) {
+func (c *VSwitchClient) WaitReady(vSwitchId string) (*v1.VSwitch, error) {
 
 	logger := c.WithValues("SDKAction", "WaitReady")
 
-	var vSwitch *vpc.VSwitch
+	var vSwitch *v1.VSwitch
 	if err := retry.Try(retry.DefaultBackOff, func() error {
 		logger.Info("describe vpc", "vpcId", vSwitchId)
 

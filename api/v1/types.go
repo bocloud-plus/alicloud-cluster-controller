@@ -1,5 +1,10 @@
 package v1
 
+import (
+	"github.com/aliyun/alibaba-cloud-sdk-go/services/cs"
+	"github.com/aliyun/alibaba-cloud-sdk-go/services/vpc"
+)
+
 const (
 
 	//VPC的状态，取值：
@@ -7,6 +12,15 @@ const (
 	//Available：可用。
 	StatusPending   = "Pending"
 	StatusAvailable = "Available"
+
+	Finalizer = "cloudplus.io/finalizer"
+
+	PhasePending      = ""
+	PhaseCreating     = "Creating"
+	PhaseRunning      = "Running"
+	PhaseDeleting     = "Deleting"
+	PhaseScalingOut   = "ScalingOut"
+	PhaseRemovingNode = "RemovingNode"
 )
 
 // VPCSpec 专有网络
@@ -18,7 +32,7 @@ type VpcSpec struct {
 	VpcId string `json:"vpc_id,omitempty"`
 
 	// 专有网络名称。长度为2-128个字符，必须以字母或中文开头，可包含数字，点号（.），下划线（_）和短横线（-），但不能以http://或https://开头。
-	VpcName string `json:"vpc_ame,omitempty"`
+	VpcName string `json:"vpc_name,omitempty"`
 	// VPC的网段。您可以使用以下网段或其子集：
 	//   10.0.0.0/8。
 	//   172.16.0.0/12（默认值）。
@@ -102,10 +116,10 @@ type ClusterSpec struct {
 	OsType                   string      `json:"os_type"`
 	Platform                 string      `json:"platform"`
 	NodePortRange            string      `json:"node_port_range"`
-	KeyPair                  string      `json:"key_pair"`
+	LoginPassword            string      `json:"login_password"`
 	CPUPolicy                string      `json:"cpu_policy"`
 	MasterCount              int         `json:"master_count"`
-	MasterVswitchIds         []string    `json:"master_vswitch_ids"`
+	MasterVswitchIds         []string    `json:"master_vswitch_ids,omitempty"`
 	MasterInstanceTypes      []string    `json:"master_instance_types"`
 	MasterSystemDiskCategory string      `json:"master_system_disk_category"`
 	MasterSystemDiskSize     int         `json:"master_system_disk_size"`
@@ -114,24 +128,154 @@ type ClusterSpec struct {
 	NumOfNodes               int         `json:"num_of_nodes"`
 	WorkerSystemDiskCategory string      `json:"worker_system_disk_category"`
 	WorkerSystemDiskSize     int         `json:"worker_system_disk_size"`
-	Vpcid                    string      `json:"vpcid"`
-	WorkerVswitchIds         []string    `json:"worker_vswitch_ids"`
+	Vpcid                    string      `json:"vpcid,omitempty"`
+	WorkerVswitchIds         []string    `json:"worker_vswitch_ids,omitempty"`
 	ContainerCidr            string      `json:"container_cidr"`
 	ServiceCidr              string      `json:"service_cidr"`
 }
 
 type Addon struct {
-	Name     string `json:"name"`
-	Config   string `json:"config"`
-	Disabled string `json:"disabled"`
+	Name     string `json:"name,omitempty"`
+	Config   string `json:"config,omitempty"`
+	Disabled string `json:"disabled,omitempty"`
 }
 
 type Tag struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Key   string `json:"key,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 type RuntimeType struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name    string `json:"name,omitempty"`
+	Version string `json:"version,omitempty"`
+}
+
+type Vpc struct {
+	VpcId                  string `json:"VpcId" xml:"VpcId"`
+	RegionId               string `json:"RegionId" xml:"RegionId"`
+	Status                 string `json:"Status" xml:"Status"`
+	VpcName                string `json:"VpcName" xml:"VpcName"`
+	CreationTime           string `json:"CreationTime" xml:"CreationTime"`
+	CidrBlock              string `json:"CidrBlock" xml:"CidrBlock"`
+	Ipv6CidrBlock          string `json:"Ipv6CidrBlock" xml:"Ipv6CidrBlock"`
+	VRouterId              string `json:"VRouterId" xml:"VRouterId"`
+	Description            string `json:"Description" xml:"Description"`
+	IsDefault              bool   `json:"IsDefault" xml:"IsDefault"`
+	NetworkAclNum          string `json:"NetworkAclNum" xml:"NetworkAclNum"`
+	ResourceGroupId        string `json:"ResourceGroupId" xml:"ResourceGroupId"`
+	CenStatus              string `json:"CenStatus" xml:"CenStatus"`
+	OwnerId                int64  `json:"OwnerId" xml:"OwnerId"`
+	SupportAdvancedFeature bool   `json:"SupportAdvancedFeature" xml:"SupportAdvancedFeature"`
+	AdvancedResource       bool   `json:"AdvancedResource" xml:"AdvancedResource"`
+	DhcpOptionsSetId       string `json:"DhcpOptionsSetId" xml:"DhcpOptionsSetId"`
+	DhcpOptionsSetStatus   string `json:"DhcpOptionsSetStatus" xml:"DhcpOptionsSetStatus"`
+	//VSwitchIds             []string `json:"VSwitchIds" xml:"VSwitchIds"`
+}
+
+type VSwitch struct {
+	VSwitchId               string `json:"VSwitchId" xml:"VSwitchId"`
+	VpcId                   string `json:"VpcId" xml:"VpcId"`
+	Status                  string `json:"Status" xml:"Status"`
+	CidrBlock               string `json:"CidrBlock" xml:"CidrBlock"`
+	Ipv6CidrBlock           string `json:"Ipv6CidrBlock" xml:"Ipv6CidrBlock"`
+	ZoneId                  string `json:"ZoneId" xml:"ZoneId"`
+	AvailableIpAddressCount int64  `json:"AvailableIpAddressCount" xml:"AvailableIpAddressCount"`
+	Description             string `json:"Description" xml:"Description"`
+	VSwitchName             string `json:"VSwitchName" xml:"VSwitchName"`
+	CreationTime            string `json:"CreationTime" xml:"CreationTime"`
+	IsDefault               bool   `json:"IsDefault" xml:"IsDefault"`
+	ResourceGroupId         string `json:"ResourceGroupId" xml:"ResourceGroupId"`
+	NetworkAclId            string `json:"NetworkAclId" xml:"NetworkAclId"`
+	OwnerId                 int64  `json:"OwnerId" xml:"OwnerId"`
+	ShareType               string `json:"ShareType" xml:"ShareType"`
+}
+
+type Cluster struct {
+	Name                   string `json:"name" xml:"name"`
+	ClusterId              string `json:"cluster_id" xml:"cluster_id"`
+	RegionId               string `json:"region_id" xml:"region_id"`
+	State                  string `json:"state" xml:"state"`
+	ClusterType            string `json:"cluster_type" xml:"cluster_type"`
+	CurrentVersion         string `json:"current_version" xml:"current_version"`
+	MetaData               string `json:"meta_data" xml:"meta_data"`
+	ResourceGroupId        string `json:"resource_group_id" xml:"resource_group_id"`
+	VpcId                  string `json:"vpc_id" xml:"vpc_id"`
+	VswitchId              string `json:"vswitch_id" xml:"vswitch_id"`
+	VswitchCidr            string `json:"vswitch_cidr" xml:"vswitch_cidr"`
+	DataDiskSize           int    `json:"data_disk_size" xml:"data_disk_size"`
+	DataDiskCategory       string `json:"data_disk_category" xml:"data_disk_category"`
+	SecurityGroupId        string `json:"security_group_id" xml:"security_group_id"`
+	ZoneId                 string `json:"zone_id" xml:"zone_id"`
+	NetworkMode            string `json:"network_mode" xml:"network_mode"`
+	MasterUrl              string `json:"master_url" xml:"master_url"`
+	DockerVersion          string `json:"docker_version" xml:"docker_version"`
+	DeletionProtection     bool   `json:"deletion_protection" xml:"deletion_protection"`
+	ExternalLoadbalancerId string `json:"external_loadbalancer_id" xml:"external_loadbalancer_id"`
+	Created                string `json:"created" xml:"created"`
+	Updated                string `json:"updated" xml:"updated"`
+	Size                   string `json:"size" xml:"size"`
+}
+
+func (vpc *Vpc) Fill(from *vpc.Vpc) {
+	vpc.VpcId = from.VpcId
+	vpc.RegionId = from.RegionId
+	vpc.Status = from.Status
+	vpc.VpcName = from.VpcName
+	vpc.CreationTime = from.CreationTime
+	vpc.CidrBlock = from.CidrBlock
+	vpc.Ipv6CidrBlock = from.Ipv6CidrBlock
+	vpc.VRouterId = from.VRouterId
+	vpc.Description = from.Description
+	vpc.IsDefault = from.IsDefault
+	vpc.NetworkAclNum = from.NetworkAclNum
+	vpc.ResourceGroupId = from.ResourceGroupId
+	vpc.CenStatus = from.CenStatus
+	vpc.OwnerId = from.OwnerId
+	vpc.SupportAdvancedFeature = from.SupportAdvancedFeature
+	vpc.AdvancedResource = from.AdvancedResource
+	vpc.DhcpOptionsSetId = from.DhcpOptionsSetId
+	vpc.DhcpOptionsSetStatus = from.DhcpOptionsSetStatus
+}
+
+func (vsw *VSwitch) Fill(from *vpc.VSwitch) {
+	vsw.VSwitchId = from.VSwitchId
+	vsw.VpcId = from.VpcId
+	vsw.Status = from.Status
+	vsw.CidrBlock = from.CidrBlock
+	vsw.Ipv6CidrBlock = from.Ipv6CidrBlock
+	vsw.ZoneId = from.ZoneId
+	vsw.AvailableIpAddressCount = from.AvailableIpAddressCount
+	vsw.Description = from.Description
+	vsw.VSwitchName = from.VSwitchName
+	vsw.CreationTime = from.CreationTime
+	vsw.IsDefault = from.IsDefault
+	vsw.ResourceGroupId = from.ResourceGroupId
+	vsw.NetworkAclId = from.NetworkAclId
+	vsw.OwnerId = from.OwnerId
+	vsw.ShareType = from.ShareType
+}
+
+func (c *Cluster) Fill(from *cs.DescribeClusterDetailResponse) {
+	c.Name = from.Name
+	c.ClusterId = from.ClusterId
+	c.RegionId = from.RegionId
+	c.State = from.State
+	c.ClusterType = from.ClusterType
+	c.CurrentVersion = from.CurrentVersion
+	c.MetaData = from.MetaData
+	c.ResourceGroupId = from.ResourceGroupId
+	c.VpcId = from.VpcId
+	c.VswitchId = from.VswitchId
+	c.VswitchCidr = from.VswitchCidr
+	c.DataDiskSize = from.DataDiskSize
+	c.DataDiskCategory = from.DataDiskCategory
+	c.SecurityGroupId = from.SecurityGroupId
+	c.ZoneId = from.ZoneId
+	c.NetworkMode = from.NetworkMode
+	c.DockerVersion = from.DockerVersion
+	c.DeletionProtection = from.DeletionProtection
+	c.ExternalLoadbalancerId = from.ExternalLoadbalancerId
+	c.Created = from.Created
+	c.Updated = from.Updated
+	c.Size = from.Size
 }

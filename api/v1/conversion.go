@@ -1,8 +1,12 @@
 package v1
 
 import (
-"github.com/aliyun/alibaba-cloud-sdk-go/services/vpc"
-"k8s.io/apimachinery/pkg/util/rand"
+	"encoding/json"
+	"fmt"
+	"github.com/aliyun/alibaba-cloud-sdk-go/services/cs"
+	"github.com/aliyun/alibaba-cloud-sdk-go/services/vpc"
+	"k8s.io/apimachinery/pkg/util/rand"
+	"log"
 )
 
 func (s *VpcSpec) ConvertToCreateRequest() *vpc.CreateVpcRequest {
@@ -31,3 +35,25 @@ func (s *VSwitchSpec) ConvertToCreateRequest() *vpc.CreateVSwitchRequest {
 	return req
 }
 
+func (s *ClusterSpec) ConvertToCreateRequest() *cs.CreateClusterRequest {
+	req := cs.CreateCreateClusterRequest()
+	req.Scheme = "https"
+	req.Method = "POST"
+
+	req.Domain = "cs.aliyuncs.com"
+	//request.Version = "2015-12-15"
+	//request.PathPattern = "/clusters"
+	req.Headers["Content-Type"] = "application/json"
+	req.QueryParams["RegionId"] = s.RegionID
+
+	clusterJson, err := json.Marshal(s)
+	if err != nil {
+		log.Println("json marshal error: ", err.Error())
+	}
+
+	fmt.Println(string(clusterJson))
+	fmt.Println(s.WorkerVswitchIds)
+	req.Content = clusterJson
+
+	return req
+}

@@ -8,6 +8,15 @@ metadata:
   creationTimestamp: null
   name: alicloudclusters.cluster.cloudplus.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.vpc.VpcId
+    description: VPC ID
+    name: VPCID
+    type: string
+  - JSONPath: .status.vswitch.VSwitchId
+    description: VSwitch ID
+    name: VSwitchID
+    type: string
   group: cluster.cloudplus.io
   names:
     kind: AlicloudCluster
@@ -15,6 +24,7 @@ spec:
     plural: alicloudclusters
     singular: alicloudcluster
   scope: Namespaced
+  subresources: {}
   validation:
     openAPIV3Schema:
       description: AlicloudCluster is the Schema for the alicloudclusters API
@@ -34,13 +44,393 @@ spec:
         spec:
           description: AlicloudClusterSpec defines the desired state of AlicloudCluster
           properties:
-            foo:
-              description: Foo is an example field of AlicloudCluster. Edit AlicloudCluster_types.go
-                to remove/update
+            cluster:
+              properties:
+                addons:
+                  items:
+                    properties:
+                      config:
+                        type: string
+                      disabled:
+                        type: string
+                      name:
+                        type: string
+                    type: object
+                  type: array
+                cloud_monitor_flags:
+                  type: boolean
+                cluster_type:
+                  type: string
+                container_cidr:
+                  type: string
+                cpu_policy:
+                  type: string
+                deletion_protection:
+                  type: boolean
+                disable_rollback:
+                  type: boolean
+                endpoint_public_access:
+                  type: boolean
+                kubernetes_version:
+                  type: string
+                login_password:
+                  type: string
+                master_count:
+                  type: integer
+                master_instance_types:
+                  items:
+                    type: string
+                  type: array
+                master_system_disk_category:
+                  type: string
+                master_system_disk_size:
+                  type: integer
+                master_vswitch_ids:
+                  items:
+                    type: string
+                  type: array
+                name:
+                  type: string
+                node_cidr_mask:
+                  type: string
+                node_port_range:
+                  type: string
+                num_of_nodes:
+                  type: integer
+                os_type:
+                  type: string
+                platform:
+                  type: string
+                proxy_mode:
+                  type: string
+                region_id:
+                  type: string
+                runtime:
+                  properties:
+                    name:
+                      type: string
+                    version:
+                      type: string
+                  type: object
+                service_cidr:
+                  type: string
+                snat_entry:
+                  type: boolean
+                ssh_flags:
+                  type: boolean
+                tags:
+                  items:
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                  type: array
+                timeout_mins:
+                  type: integer
+                vpcid:
+                  type: string
+                worker_instance_types:
+                  items:
+                    type: string
+                  type: array
+                worker_system_disk_category:
+                  type: string
+                worker_system_disk_size:
+                  type: integer
+                worker_vswitch_ids:
+                  items:
+                    type: string
+                  type: array
+              required:
+              - addons
+              - cloud_monitor_flags
+              - cluster_type
+              - container_cidr
+              - cpu_policy
+              - deletion_protection
+              - disable_rollback
+              - endpoint_public_access
+              - kubernetes_version
+              - login_password
+              - master_count
+              - master_instance_types
+              - master_system_disk_category
+              - master_system_disk_size
+              - name
+              - node_cidr_mask
+              - node_port_range
+              - num_of_nodes
+              - os_type
+              - platform
+              - proxy_mode
+              - region_id
+              - runtime
+              - service_cidr
+              - snat_entry
+              - ssh_flags
+              - tags
+              - timeout_mins
+              - worker_instance_types
+              - worker_system_disk_category
+              - worker_system_disk_size
+              type: object
+            nodes:
+              description: Cluster Workers
+              items:
+                type: string
+              type: array
+            region_id:
+              description: Region ID
               type: string
+            vpc:
+              description: VPC Spec
+              properties:
+                cidr_block:
+                  description: VPC的网段。您可以使用以下网段或其子集：   10.0.0.0/8。   172.16.0.0/12（默认值）。   192.168.0.0/16。
+                  type: string
+                description:
+                  description: VPC的描述信息。长度为2-256个字符，必须以字母或中文开头，但不能以http://或https://开头。
+                  type: string
+                vpc_id:
+                  description: 使用一个已经存在的VPC
+                  type: string
+                vpc_name:
+                  description: 专有网络名称。长度为2-128个字符，必须以字母或中文开头，可包含数字，点号（.），下划线（_）和短横线（-），但不能以http://或https://开头。
+                  type: string
+              type: object
+            vswitch:
+              description: VSwitch Spec
+              properties:
+                cidr_block:
+                  description: 交换机的网段。交换机网段要求如下： 交换机的网段的掩码长度范围为16~29位。 交换机的网段必须从属于所在VPC的网段。
+                    交换机的网段不能与所在VPC中路由条目的目标网段相同，但可以是目标网段的子集。
+                  type: string
+                description:
+                  description: 交换机的描述信息。 描述长度为2~256个字符，必须以字母或中文开头，但不能以http://或https://开头。
+                  type: string
+                vpc_id:
+                  description: 要创建的交换机所属的VPC ID。
+                  type: string
+                vswitch_id:
+                  description: 使用存在的VSwitch
+                  type: string
+                vswitch_name:
+                  description: 交换机的名称。 名称长度为2~128个字符，必须以字母或中文开头，但不能以http://或https://开头。
+                  type: string
+                zone_id:
+                  description: 可用区ID
+                  type: string
+              type: object
+          required:
+          - cluster
+          - region_id
+          - vpc
+          - vswitch
           type: object
         status:
           description: AlicloudClusterStatus defines the observed state of AlicloudCluster
+          properties:
+            cluster:
+              properties:
+                cluster_id:
+                  type: string
+                cluster_type:
+                  type: string
+                created:
+                  type: string
+                current_version:
+                  type: string
+                data_disk_category:
+                  type: string
+                data_disk_size:
+                  type: integer
+                deletion_protection:
+                  type: boolean
+                docker_version:
+                  type: string
+                external_loadbalancer_id:
+                  type: string
+                master_url:
+                  type: string
+                meta_data:
+                  type: string
+                name:
+                  type: string
+                network_mode:
+                  type: string
+                region_id:
+                  type: string
+                resource_group_id:
+                  type: string
+                security_group_id:
+                  type: string
+                size:
+                  type: string
+                state:
+                  type: string
+                updated:
+                  type: string
+                vpc_id:
+                  type: string
+                vswitch_cidr:
+                  type: string
+                vswitch_id:
+                  type: string
+                zone_id:
+                  type: string
+              required:
+              - cluster_id
+              - cluster_type
+              - created
+              - current_version
+              - data_disk_category
+              - data_disk_size
+              - deletion_protection
+              - docker_version
+              - external_loadbalancer_id
+              - master_url
+              - meta_data
+              - name
+              - network_mode
+              - region_id
+              - resource_group_id
+              - security_group_id
+              - size
+              - state
+              - updated
+              - vpc_id
+              - vswitch_cidr
+              - vswitch_id
+              - zone_id
+              type: object
+            cluster_id:
+              description: Cluster ID
+              type: string
+            kubeconfig:
+              type: string
+            nodes:
+              items:
+                type: string
+              type: array
+            phase:
+              description: Phase
+              type: string
+            vpc:
+              properties:
+                AdvancedResource:
+                  type: boolean
+                CenStatus:
+                  type: string
+                CidrBlock:
+                  type: string
+                CreationTime:
+                  type: string
+                Description:
+                  type: string
+                DhcpOptionsSetId:
+                  type: string
+                DhcpOptionsSetStatus:
+                  type: string
+                Ipv6CidrBlock:
+                  type: string
+                IsDefault:
+                  type: boolean
+                NetworkAclNum:
+                  type: string
+                OwnerId:
+                  format: int64
+                  type: integer
+                RegionId:
+                  type: string
+                ResourceGroupId:
+                  type: string
+                Status:
+                  type: string
+                SupportAdvancedFeature:
+                  type: boolean
+                VRouterId:
+                  type: string
+                VpcId:
+                  type: string
+                VpcName:
+                  type: string
+              required:
+              - AdvancedResource
+              - CenStatus
+              - CidrBlock
+              - CreationTime
+              - Description
+              - DhcpOptionsSetId
+              - DhcpOptionsSetStatus
+              - Ipv6CidrBlock
+              - IsDefault
+              - NetworkAclNum
+              - OwnerId
+              - RegionId
+              - ResourceGroupId
+              - Status
+              - SupportAdvancedFeature
+              - VRouterId
+              - VpcId
+              - VpcName
+              type: object
+            vswitch:
+              properties:
+                AvailableIpAddressCount:
+                  format: int64
+                  type: integer
+                CidrBlock:
+                  type: string
+                CreationTime:
+                  type: string
+                Description:
+                  type: string
+                Ipv6CidrBlock:
+                  type: string
+                IsDefault:
+                  type: boolean
+                NetworkAclId:
+                  type: string
+                OwnerId:
+                  format: int64
+                  type: integer
+                ResourceGroupId:
+                  type: string
+                ShareType:
+                  type: string
+                Status:
+                  type: string
+                VSwitchId:
+                  type: string
+                VSwitchName:
+                  type: string
+                VpcId:
+                  type: string
+                ZoneId:
+                  type: string
+              required:
+              - AvailableIpAddressCount
+              - CidrBlock
+              - CreationTime
+              - Description
+              - Ipv6CidrBlock
+              - IsDefault
+              - NetworkAclId
+              - OwnerId
+              - ResourceGroupId
+              - ShareType
+              - Status
+              - VSwitchId
+              - VSwitchName
+              - VpcId
+              - ZoneId
+              type: object
+          required:
+          - cluster_id
+          - kubeconfig
+          - phase
           type: object
       type: object
   version: v1

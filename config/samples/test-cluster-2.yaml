@@ -1,7 +1,7 @@
 apiVersion: cluster.cloudplus.io/v1
 kind: AlicloudCluster
 metadata:
-  name: test-cluster-1
+  name: test-cluster-2
 spec:
   # Add fields here
   region_id: "cn-hangzhou"
@@ -12,12 +12,12 @@ spec:
   vswitch:
     vswitch_name: "test-vsw-1234"
     cidr_block: "192.168.0.0/24"
-    zone_id: "cn-hangzhou-b"
     description: "test-vsw-1234"
+    zone_id: "cn-hangzhou-b"
   cluster:
     region_id: "cn-hangzhou"
     cluster_type: Kubernetes
-    name: test-cluster-1
+    name: test-cluster-2
     disable_rollback: true
     timeout_mins: 60
     kubernetes_version: 1.16.9-aliyun.1
@@ -29,10 +29,12 @@ spec:
     node_cidr_mask: "26"
     proxy_mode: ipvs
     tags:
-      - key: "aaa"
-        value: "bbb"
+      - aaa: "bbb"
     addons:
       - name: "flannel"
+      - name: "arms-prometheus"
+      - name: "flexvolume"
+      - name: "alicloud-disk-controller"
     os_type: Linux
     platform: CentOS
     node_port_range: "30000-32767"
@@ -40,17 +42,17 @@ spec:
     cpu_policy: none
     master_count: 3
     master_instance_types:
-      - "ecs.n1.medium"
-      - "ecs.n1.medium"
-      - "ecs.n1.medium"
+      - "ecs.n4.large"
+      - "ecs.n4.large"
+      - "ecs.n4.large"
     master_system_disk_category: cloud_ssd
     master_system_disk_size: 120
     runtime:
       name: docker
       version: "18.09.2"
     worker_instance_types:
-      - "ecs.n1.medium"
-      - "ecs.n1.medium"
+      - "ecs.i1.xlarge"
+      - "ecs.i1.xlarge"
     num_of_nodes: 2
     worker_system_disk_category: cloud_efficiency
     worker_system_disk_size: 120

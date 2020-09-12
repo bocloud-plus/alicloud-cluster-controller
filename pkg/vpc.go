@@ -24,7 +24,7 @@ type VpcClient struct {
 	cli *vpc.Client
 }
 
-func (c *VpcClient) Describe(vpcId string) (*vpc.Vpc, error) {
+func (c *VpcClient) Describe(vpcId string) (*v1.Vpc, error) {
 	logger := c.WithValues("SDKAction", "Describe", "id", vpcId)
 	req := vpc.CreateDescribeVpcsRequest()
 	req.Scheme = "https"
@@ -48,11 +48,12 @@ func (c *VpcClient) Describe(vpcId string) (*vpc.Vpc, error) {
 	if resp.TotalCount == 0 {
 		return nil, nil
 	}
-	ret := &resp.Vpcs.Vpc[0]
+	ret := &v1.Vpc{}
+	ret.Fill(&resp.Vpcs.Vpc[0])
 	return ret, nil
 }
 
-func (c *VpcClient) Create(spec *v1.VpcSpec) (string, error) {
+func (c *VpcClient) Create(spec v1.VpcSpec) (string, error) {
 	logger := c.WithValues("SDKAction", "Create")
 	req := spec.ConvertToCreateRequest()
 
@@ -73,11 +74,11 @@ func (c *VpcClient) Create(spec *v1.VpcSpec) (string, error) {
 	return resp.VpcId, nil
 }
 
-func (c *VpcClient) WaitReady(vpcId string) (*vpc.Vpc, error) {
+func (c *VpcClient) WaitReady(vpcId string) (*v1.Vpc, error) {
 
 	logger := c.WithValues("SDKAction", "WaitReady")
 
-	var vpc *vpc.Vpc
+	var vpc *v1.Vpc
 	if err := retry.Try(retry.DefaultBackOff, func() error {
 		logger.Info("describe vpc", "vpcId", vpcId)
 
